@@ -22,17 +22,8 @@ const resetPassword = () => {
             )
             .required("Password is required"),
         confirmPassword: Yup.string()
-            .min(8, "Pasword must be 8 or more characters")
-            .matches(
-                /(?=.*[a-z])(?=.*[A-Z])\w+/,
-                "Password ahould contain at least one uppercase and lowercase character"
-            )
-            .matches(/\d/, "Password should contain at least one number")
-            .matches(
-                /[`!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?~]/,
-                "Password should contain at least one special character"
-            )
-            .required("Password is required"),
+        .required('Confirm Password is required')
+        .oneOf([Yup.ref('password')], 'Passwords must match'),
     });
     const {
         register,
@@ -110,7 +101,7 @@ const resetPassword = () => {
                                             className="block uppercase text-blueGray-600 text-xs font-bold mb-2"
                                             htmlFor="grid-password"
                                         >
-                                            Password
+                                           Confirm Password
                                         </label>
                                         <input
                                             {...register("confirmPassword")}
@@ -124,26 +115,13 @@ const resetPassword = () => {
                                             </p>
                                         )}
                                     </div>
-                                    <div>
-                                        <label className="inline-flex items-center cursor-pointer">
-                                            <input
-                                                id="customCheckLogin"
-                                                type="checkbox"
-                                                className="form-checkbox border-0 rounded text-blueGray-700 ml-1 w-5 h-5 ease-linear transition-all duration-150"
-                                            />
-                                            <span className="ml-2 text-sm font-semibold text-blueGray-600">
-                                                Remember me
-                                            </span>
-                                        </label>
-                                    </div>
-
-                                    <div className="text-center mt-6">
+                                        <div className="text-center mt-6">
                                         <button
                                             className="bg-blueGray-800 text-white active:bg-blueGray-600 text-sm font-bold uppercase px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 w-full ease-linear transition-all duration-150"
                                             value="Submit"
                                             type="submit"
                                         >
-                                            Sign In
+                                            Submit
                                         </button>
                                     </div>
                                 </form>

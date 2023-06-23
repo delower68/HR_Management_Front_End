@@ -10,7 +10,7 @@ export default function FooterSmall(props) {
             : "relative") + " pb-6"
         }
       >
-        <div className="container mx-auto px-4">
+        {/* <div className="container mx-auto px-4">
           <hr className="mb-6 border-b-1 border-blueGray-600" />
           <div className="flex flex-wrap items-center md:justify-between justify-center">
             <div className="w-full md:w-4/12 px-4">
@@ -61,7 +61,7 @@ export default function FooterSmall(props) {
               </ul>
             </div>
           </div>
-        </div>
+        </div> */}
       </footer>
     </>
   );

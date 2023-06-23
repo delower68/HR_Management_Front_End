@@ -1,6 +1,6 @@
 "use client"
 import Link from 'next/link'
-import React, { useState } from 'react'
+import React from 'react'
 import { useForm } from "react-hook-form";
 import * as Yup from "yup";
 import {yupResolver} from '@hookform/resolvers/yup';
@@ -10,7 +10,6 @@ import axios from 'axios';
 import Auth from "layouts/Auth.js";
 
 export default function Login() {
-  const [isChecked, setIsChecked] = useState(false);
 
   const validationSchema = Yup.object().shape({
     email: Yup.string()
@@ -129,7 +128,6 @@ export default function Login() {
                   <div>
                     <label className="inline-flex items-center cursor-pointer">
                       <input
-                      onChange={() => setIsChecked(!isChecked)}
                         id="customCheckLogin"
                         type="checkbox"
                         className="form-checkbox border-0 rounded text-blueGray-700 ml-1 w-5 h-5 ease-linear transition-all duration-150"
@@ -145,7 +143,6 @@ export default function Login() {
                       className="bg-blueGray-800 text-white active:bg-blueGray-600 text-sm font-bold uppercase px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 w-full ease-linear transition-all duration-150"
                       value="Submit"
                       type="submit"
-                      disabled={!isChecked}
                     >
                       Sign In
                     </button>
@@ -155,19 +152,16 @@ export default function Login() {
             </div>
             <div className="flex flex-wrap mt-6 relative">
               <div className="w-1/2">
-                <a
+                <Link
                   href="#pablo"
                   onClick={(e) => e.preventDefault()}
-                  className="text-blueGray-200"
                 >
-                  <small>Forgot password?</small>
-                </a>
+                  <small className="text-blueGray-200">Forgot password?</small>
+                </Link>
               </div>
               <div className="w-1/2 text-right">
                 <Link href="/auth/register">
-                  <a href="#pablo" className="text-blueGray-200">
-                    <small>Create new account</small>
-                  </a>
+                    <small className="text-blueGray-200">Create new account</small>
                 </Link>
               </div>
             </div>
