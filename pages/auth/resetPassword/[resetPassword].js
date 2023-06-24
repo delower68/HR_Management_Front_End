@@ -6,8 +6,14 @@ import * as Yup from "yup";
 import { yupResolver } from '@hookform/resolvers/yup';
 
 import axios from 'axios';
+import { useRouter } from 'next/router';
+
 
 const resetPassword = () => {
+    const router = useRouter(); 
+    const {resetPassword} = router?.query;
+    console.log(resetPassword)
+
     const validationSchema = Yup.object().shape({
         password: Yup.string()
             .min(8, "Pasword must be 8 or more characters")
@@ -35,30 +41,38 @@ const resetPassword = () => {
 
     const handelResetPassword = (data) => {
         validationSchema
-            .validate(data, { abortEarly: false })
-            .then(async (formData) => {
-                // const data = await axios.post(
-                //   "agent_eighth_step/",
-                // formData
-                // );
-                console.log(data)
-                if (data.status >= 200 && data.status < 300) {
-                    navigate("/dashboard");
-                }
-            })
-            .catch((validationErrors) => {
-                const errorMessages = validationErrors.inner.reduce(
-                    (messages, error) => {
-                        return {
-                            ...messages,
-                            [error.path]: error.message,
-                        };
-                    },
-                    {}
-                );
-                console.log(errorMessages);
-            });
-    };
+          .validate(data, { abortEarly: false })
+          .then(async (formData) => {
+            const resetFormData = {
+              password: formData.password,
+              token: resetPassword,
+            };
+            const response = await axios.post(
+              `https://hr-management-1wt7.onrender.com/api/v1/reset_password/${resetPassword}`,
+              resetFormData
+            );
+            console.log(response.data);
+            if (response.status >= 200 && response.status < 300) {
+              router.push("/auth/login");
+            }
+          })
+          .catch((validationErrors) => {
+            if (validationErrors.inner && validationErrors.inner.length > 0) {
+              const errorMessages = validationErrors.inner?.reduce(
+                (messages, error) => ({
+                  ...messages,
+                  [error.path]: error.message,
+                }),
+                {}
+              );
+              console.log(errorMessages);
+            } else {
+              console.log(validationErrors.message);
+            }
+          });
+      };
+      
+    
     return (
         <div className='flex justify-center items-center mt-48 md:4'>
             <div className="container mx-auto px-4 h-full">
@@ -107,7 +121,7 @@ const resetPassword = () => {
                                             {...register("confirmPassword")}
                                             type="password"
                                             className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-                                            placeholder="confirm password"
+                                            placeholder="Confirm password"
                                         />
                                         {errors.confirmPassword && (
                                             <p className="text-blueGray-700 text-xs mt-2">

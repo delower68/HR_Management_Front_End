@@ -9,12 +9,16 @@ import axios from 'axios';
 // layout for page
 
 import Auth from "layouts/Auth.js";
+import { useRouter } from 'next/router';
+import { useToasts } from 'react-toast-notifications';
 
 export default function Register() {
   const [isChecked, setIsChecked] = useState(false);
+  const router = useRouter();
+  const { addToast } = useToasts();
 
   const validationSchema = Yup.object().shape({
-    name: Yup.string()
+    full_name: Yup.string()
       .min(3, "Minimum 8 symbols")
       .max(50, "Maximum 50 symbols")
       .required("Name is required"),
@@ -51,29 +55,33 @@ export default function Register() {
   const handelSignUp = (data) => {
     validationSchema
       .validate(data, { abortEarly: false })
-      .then(async(formData) => {
-        // const data = await axios.post(
-        //   "https://hr-temp.onrender.com/api/v1/auth",
-        //   formData
-        // );
-        console.log(data)
-        if (data.status >= 200 && data.status < 300) {
-          navigate("/dashboard");
+      .then(async (formData) => {
+        const response = await axios.post(
+          "https://hr-management-1wt7.onrender.com/api/v1/register",
+          formData
+        );
+        console.log(response.data);
+        if (response.status >= 200 && response.status < 300) {
+          router.push("/auth/login");
         }
       })
-      .catch((validationErrors) => {
-        const errorMessages = validationErrors.inner?.reduce(
-          (messages, error) => {
-            return {
-              ...messages,
-              [error.path]: error.message,
-            };
-          },
-          {}
-        );
-        console.log(errorMessages);
+      .catch((error) => {
+        if (error.response) {
+          const response = error.response;
+          if (response.status === 406) {
+            addToast("Your email is already registered", { appearance: "error" });
+          } else {
+            console.log(response.data);
+          }
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log("Error", error.message);
+        }
+        console.log(error.config);
       });
   };
+  
   return (
     <>
       <div className="container mx-auto px-4 h-full">
@@ -96,17 +104,17 @@ export default function Register() {
                       className="block uppercase text-blueGray-600 text-xs font-bold mb-2"
                       htmlFor="grid-password"
                     >
-                      Name
+                      Full Name
                     </label>
                     <input
-                    {...register("name")}
+                    {...register("full_name")}
                       type="text"
                       className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-                      placeholder="Name"
+                      placeholder="Full name"
                     />
-                    {errors.name && (
+                    {errors.full_name && (
                 <p className="text-violet-800 text-xs  mt-2">
-                  {errors.name?.message}
+                  {errors.full_name?.message}
                 </p>
               )}
                   </div>

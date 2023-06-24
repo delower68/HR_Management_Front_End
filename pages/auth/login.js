@@ -5,11 +5,17 @@ import { useForm } from "react-hook-form";
 import * as Yup from "yup";
 import {yupResolver} from '@hookform/resolvers/yup';
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // layout for page
 import Auth from "layouts/Auth.js";
+import { useRouter } from 'next/router';
+import { useToasts } from 'react-toast-notifications';
 
 export default function Login() {
+  const router = useRouter();
+  const { addToast } = useToasts();
 
   const validationSchema = Yup.object().shape({
     email: Yup.string()
@@ -45,29 +51,44 @@ export default function Login() {
   const handelSignIn = (data) => {
     validationSchema
       .validate(data, { abortEarly: false })
-      .then(async(formData) => {
-        // const data = await axios.post(
-        //   "agent_eighth_step/",
-        // formData
-        // );
-        console.log(data)
-        if (data.status >= 200 && data.status < 300) {
-          navigate("/dashboard");
+      .then(async (formData) => {
+        const response = await axios.post(
+          "https://hr-management-1wt7.onrender.com/api/v1/login",
+          formData
+        );
+        const userInfo = response.data.user;
+        console.log(userInfo.status);
+        if (response.status >= 200 && response.status < 300) {
+          router.push("/admin/dashboard");
+          addToast("Successfully login", { appearance: "success" });
+          localStorage.setItem("user", JSON.stringify(userInfo));
         }
       })
-      .catch((validationErrors) => {
-        const errorMessages = validationErrors.inner.reduce(
-          (messages, error) => {
-            return {
-              ...messages,
-              [error.path]: error.message,
-            };
-          },
-          {}
-        );
-        console.log(errorMessages);
+      .catch((error) => {
+        if (error.response) {
+          const response = error.response;
+          if (response.status === 500) {
+            addToast("Email not found", { appearance: "error" });
+          } else if (response.status === 401) {
+            addToast("Email is not verified", { appearance: "error" });
+          } else if (response.status >= 400 && response.status <= 500) {
+            const errorMessage = response.data.message;
+            console.log(errorMessage);
+            addToast(errorMessage, { appearance: "error" });
+          } else {
+            addToast("Internal server error", { appearance: "error" });
+          }
+        } else if (error.request) {
+          console.log(error.request);
+          addToast("No response from server", { appearance: "error" });
+        } else {
+          console.log("Error", error.message);
+          addToast("An error occurred", { appearance: "error" });
+        }
+        console.log(error.config);
       });
   };
+  
   return (
     <>
       <div className="container mx-auto px-4 h-full">
@@ -153,8 +174,7 @@ export default function Login() {
             <div className="flex flex-wrap mt-6 relative">
               <div className="w-1/2">
                 <Link
-                  href="#pablo"
-                  onClick={(e) => e.preventDefault()}
+                  href="/auth/forgetPassword"
                 >
                   <small className="text-blueGray-200">Forgot password?</small>
                 </Link>

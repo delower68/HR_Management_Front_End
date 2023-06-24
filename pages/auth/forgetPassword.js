@@ -26,17 +26,18 @@ const forgetPassword = () => {
         validationSchema
           .validate(data, { abortEarly: false })
           .then(async(formData) => {
-            // const data = await axios.post(
-            //   "agent_eighth_step/",
-            // formData
-            // );
+            const data = await axios.get(
+                `https://hr-management-1wt7.onrender.com/api/v1/forgot_password/${formData.email}`,
+            formData
+            );
             console.log(data)
             if (data.status >= 200 && data.status < 300) {
+                // toast.info(`We sent an email to reset password.`)
               navigate("/dashboard");
             }
           })
           .catch((validationErrors) => {
-            const errorMessages = validationErrors.inner.reduce(
+            const errorMessages = validationErrors.inner?.reduce(
               (messages, error) => {
                 return {
                   ...messages,
